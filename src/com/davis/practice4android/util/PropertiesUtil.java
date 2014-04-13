@@ -3,100 +3,137 @@
  */
 package com.davis.practice4android.util;
 
-import java.io.BufferedInputStream;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
+import java.util.Hashtable;
 import java.util.Properties;
 
-/**
- * @author skyworth
- * @date 2013-10-11 下午5:44:28
- * @Description 
- */
 public final class PropertiesUtil {
 
-	private PropertiesUtil(){
-		
+	private static PropertiesUtil instance = new PropertiesUtil();
+
+	private PropertiesUtil() {
+
 	}
 	
-	public static String get(String propertiesFile,String key){
-		 
-		Reader reader = null;
-		String value = null;
-		try {
-			reader = new InputStreamReader(new BufferedInputStream(
-					new FileInputStream(propertiesFile)),
-					EncodeType.getEncode(propertiesFile));
-			Properties properties = new Properties();
-			properties.load(reader);
-			value = properties.getProperty(key);
-		} catch (Exception e) {
-
-		} finally {
-			if (null != reader) {
+	public static PropertiesUtil getInstance(){
+		return instance;
+	}
+	
+	private Hashtable<String, Properties> propertiesTable = new Hashtable<String, Properties>();
+	private Hashtable<String,Long> fileLastModifiedTable = new Hashtable<String,Long>();
+	
+	public synchronized Object getProperty(String propertiesFilename,String propertyName,String defaultValue){
+		File propertyFile = new File(propertiesFilename);
+		long newlastModified = propertyFile.lastModified();
+		if(newlastModified>0){
+			long lastModified = 0;
+			if(fileLastModifiedTable.containsKey(propertiesFilename)){
+				lastModified = fileLastModifiedTable.get(propertiesFilename);
+			}
+			Properties properties = null;
+			if(newlastModified>lastModified){
+				properties = new Properties();
+				FileInputStream fis = null;
 				try {
-					reader.close();
+					fis = new FileInputStream(propertyFile);
+					properties.load(fis);
+					fileLastModifiedTable.put(propertiesFilename, newlastModified);
+					propertiesTable.put(propertiesFilename, properties);
+				} catch (FileNotFoundException e) {
 				} catch (IOException e) {
-					e.printStackTrace();
+				}finally{
+					if(null!=fis){
+						try {
+							fis.close();
+						} catch (IOException e) {
+						}
+					}
+				}
+				
+			}else{
+				properties = propertiesTable.get(propertiesFilename);
+			}
+			return properties.getProperty(propertyName, defaultValue);
+		}else{
+			try {
+				propertyFile.createNewFile();
+			} catch (IOException e) {
+			}
+		}
+		return defaultValue;
+	}
+	
+	public synchronized void setProperties(String propertiesFilename,String propertyName,String propertyValue){
+		File propertyFile = new File(propertiesFilename);
+		long newlastModified = propertyFile.lastModified();
+		Properties properties = null;
+		if(newlastModified>0){
+			long lastModified = 0;
+			if(fileLastModifiedTable.containsKey(propertiesFilename)){
+				lastModified = fileLastModifiedTable.get(propertiesFilename);
+			}
+			
+			if(newlastModified>lastModified){
+				properties = new Properties();
+				FileInputStream fis = null;
+				try {
+					fis = new FileInputStream(propertyFile);
+					properties.load(fis);
+					fileLastModifiedTable.put(propertiesFilename, newlastModified);
+					propertiesTable.put(propertiesFilename, properties);
+				} catch (FileNotFoundException e) {
+				} catch (IOException e) {
+				}finally{
+					if(null!=fis){
+						try {
+							fis.close();
+						} catch (IOException e) {
+						}
+					}
+				}
+				
+			}else{
+				properties = propertiesTable.get(propertiesFilename);
+			}
+		}else{
+			try {
+				propertyFile.createNewFile();
+				properties = new Properties();
+			} catch (IOException e) {
+				return;
+			}
+		}
+		properties.setProperty(propertyName, propertyValue);
+		FileOutputStream fos = null;
+		try {
+			fos = new FileOutputStream(propertyFile);
+			properties.store(fos, "update "+propertyName+"="+propertyValue);
+		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
+		}finally{
+			if(null!=fos){
+				try {
+					fos.close();
+				} catch (IOException e) {
 				}
 			}
 		}
-		return value;
+		newlastModified = propertyFile.lastModified();
+		fileLastModifiedTable.put(propertiesFilename, newlastModified);
+		propertiesTable.put(propertiesFilename, properties);
 	}
 	
-	public static void put(String propertiesFile,String keyName,String keyValue){
-		OutputStream os = null;
-        try{  
-        	Reader reader = new InputStreamReader(new BufferedInputStream(
-					new FileInputStream(propertiesFile)),
-					EncodeType.getEncode(propertiesFile));
-            Properties properties = new Properties();  
-            properties.load(reader);
-            reader.close();
-            os = new FileOutputStream(propertiesFile);
-            properties.setProperty(keyName, keyValue);  
-            properties.store(os, "Update '" + keyName + "' value");  
-        }catch(Exception e){
-            
-        }finally{  
-        	if(null!=os){
-        		try {
-					os.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-        	}
-        } 
-	}
-	
-	public static void put(String propertiesFile,String keyName,int keyValue){
-		OutputStream os = null;
-        try{  
-        	Reader reader = new InputStreamReader(new BufferedInputStream(
-					new FileInputStream(propertiesFile)),
-					EncodeType.getEncode(propertiesFile));
-            Properties properties = new Properties();  
-            properties.load(reader);
-            reader.close();
-            os = new FileOutputStream(propertiesFile);
-            properties.setProperty(keyName, ""+keyValue);  
-            properties.store(os, "Update '" + keyName + "' value");  
-        }catch(Exception e){
-            
-        }finally{  
-        	if(null!=os){
-        		try {
-					os.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-        	}
-        } 
-	}
+
 }
+
+	
+
+	
+
+	
+
