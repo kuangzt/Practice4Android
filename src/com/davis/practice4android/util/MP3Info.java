@@ -1,3 +1,5 @@
+package com.davis.practice4android.util;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
