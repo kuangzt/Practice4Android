@@ -1,10 +1,19 @@
 package com.davis.practice4android.util;
 
+import java.lang.reflect.Method;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Build;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.WindowManager;
 
 
 public class AppUtil {
@@ -103,16 +112,16 @@ public class AppUtil {
 				screenHeight = metrics.heightPixels;
 		        String hardware = Build.HARDWARE;
 		        if(null!=hardware){
-		        	if(hardware.startsWith("tcc893")){
-		                int orient =  getOrientation();
-		        		if(orient == LY_LANDSCAPE)
-		        		{
-		        		}
-		        		else
-		        		{
-		        			((Activity) context).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		        		}
-		        	}
+//		        	if(hardware.startsWith("tcc893")){
+//		                int orient =  getOrientation();
+//		        		if(orient == LY_LANDSCAPE)
+//		        		{
+//		        		}
+//		        		else
+//		        		{
+//		        			((Activity) context).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//		        		}
+//		        	}
 		        	
 		        }
 			} catch (Exception e) {
