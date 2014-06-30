@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<declare-styleable name="ProgressWheel">
+        <attr name="text" format="string" />
+        <attr name="textColor" format="color" />
+        <attr name="textSize" format="dimension" />
+        
+        <attr name="progressBarWidth" format="dimension"/>
+        <attr name="progressBarColor" format="color"/>
+        <attr name="roundColor" format="color"/>
+        <attr name="ringColor" format="color"/>
+        <attr name="ringWidth" format="dimension"/>     
+        
+        <attr name="spinSpeed" format="dimension" />
+        <attr name="delayMillis" format="integer" />
+        <attr name="barAngle" format="integer" />
+
+    </declare-styleable>   
+</resources>
